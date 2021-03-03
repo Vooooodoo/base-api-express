@@ -7,8 +7,11 @@ const Sequelize = require('sequelize');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const bcrypt = require('bcryptjs'); // модуль для хэширования пароля пользователя
+// dotenv is a module that loads environment variables
+// from a .env file into process.env
+require('dotenv').config();
 
-const { PORT = 4000 } = process.env;
+const { PORT } = process.env;
 
 const app = express();
 
@@ -133,5 +136,5 @@ app.use((error, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`App listening on port ${PORT}: http://localhost:4000`);
+  console.log(`App listening on port ${PORT}: http://localhost:7000`);
 });
