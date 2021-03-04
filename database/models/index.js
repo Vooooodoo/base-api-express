@@ -16,10 +16,10 @@ const sequelize = new Sequelize(config.url, config);
 // если в бд есть подобная таблица, но она не соответствует определению модели,
 // то можно использоать параметр { force: true }, чтобы удалить таблицы и создать их заново,
 // но уже с новой структурой
-// sequelize.sync({ force: true })
-//   .then(result => console.log(result))
+sequelize.sync({ force: true })
+  .then(result => console.log(result))
 
-//   .catch(err => console.log(err));
+  .catch(err => console.log(err));
 
 fs.readdirSync(__dirname)
   .filter(file => file.indexOf('.') !== 0 && file !== basename && file.slice(-3) === '.js')
