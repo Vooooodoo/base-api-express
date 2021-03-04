@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs'); // модуль для хэшировани�
 const models = require('../models');
 
 const getUsers = (req, res, next) => {
-  models.user.findAll({ raw: true })
+  models.User.findAll({ raw: true })
     .then(data => res.send(data))
 
     .catch(next);
@@ -19,7 +19,7 @@ const createUser = (req, res, next) => {
   // хешируем пароль с помощью модуля bcrypt, 10 - это длина «соли»,
   // случайной строки, которую метод добавит к паролю перед хешированием, для безопасности
   bcrypt.hash(password, 10)
-    .then(hash => models.user.create({
+    .then(hash => models.User.create({
       name,
       email,
       password: hash, // записали хеш в базу
@@ -39,7 +39,7 @@ const createUser = (req, res, next) => {
 }
 
 const removeUser = (req, res, next) => {
-  models.user.destroy({
+  models.User.destroy({
     where: {
       id: req.params.id
     }
