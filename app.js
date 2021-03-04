@@ -2,10 +2,6 @@
 // from a .env file into process.env
 require('dotenv').config();
 const express = require('express');
-// подключим ORM-библиотеку для приложений на Node.js
-// при использовании Sequelize можно не писать SQL-запросы,
-// а работать с данными как с обычными объектами
-const Sequelize = require('sequelize');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const usersRouter = require('./routes/users');

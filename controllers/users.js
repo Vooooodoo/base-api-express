@@ -19,14 +19,14 @@ const createUser = (req, res, next) => {
   // хешируем пароль с помощью модуля bcrypt, 10 - это длина «соли»,
   // случайной строки, которую метод добавит к паролю перед хешированием, для безопасности
   bcrypt.hash(password, 10)
-    .then((hash) => models.User.create({
+    .then(hash => models.User.create({
       name,
       email,
       password: hash, // записали хеш в базу
       dob,
     }))
 
-    .then((data) => {
+    .then(data => {
       res.send({
         id: data.id,
         name: data.name,
