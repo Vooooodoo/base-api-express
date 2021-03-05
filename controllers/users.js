@@ -54,11 +54,11 @@ const removeUser = (req, res, next) => {
         }
       })
 
-      .then(() => res.status(200).send('Пользователь успешно удалён.'))
+        .then(() => res.status(200).send({ message: 'Пользователь успешно удалён.' }))
     })
 
     .catch((err) => {
-      res.status(404).send(err.message);
+      res.status(404).send({ message: `${err.message}` });
     })
 
     .catch(next);
