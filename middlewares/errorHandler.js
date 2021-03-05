@@ -5,7 +5,7 @@ const errorHandler =  ((error, req, res, next) => {
 
   res
     .status(statusCode)
-    .send({
+    .json({
       // проверяем статус и выставляем сообщение в зависимости от него
       message: statusCode === 500
         ? 'На сервере произошла ошибка'

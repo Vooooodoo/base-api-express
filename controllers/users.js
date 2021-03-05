@@ -11,34 +11,40 @@ const getUsers = (req, res, next) => {
     .catch(next);
 }
 
-const createUser = (req, res, next) => {
-  const {
-    name,
-    email,
-    password,
-    dob,
-  } = req.body;
-
-  // хешируем пароль с помощью модуля bcrypt, 10 - это длина «соли»,
-  // случайной строки, которую метод добавит к паролю перед хешированием, для безопасности
-  bcrypt.hash(password, 10)
-    .then(hash => models.User.create({
+const createUser = async (req, res, next) => {
+  try {
+    const {
       name,
       email,
-      password: hash, // записали хеш в базу
+      password,
       dob,
-    }))
+    } = req.body;
+    const user = await models.User.findOne({ where: { email: email } });
 
-    .then(data => {
-      res.send({
-        id: data.id,
-        name: data.name,
-        email: data.email,
-        dob: data.dob,
-      }); // вернули объект из базы с записанными в него данными пользователя
+    if (user) {
+      throw new Error('Пользователь с таким email уже существует.');
+    }
+
+    // запишем хеш пароля в константу с помощью модуля bcrypt в синхронном режиме,
+    // 10 - это длина «соли», случайной строки,
+    // которую метод добавит к паролю перед хешированием, для безопасности
+    const passwordHash = bcrypt.hashSync(password, 10);
+    const userData = await models.User.create({
+      name,
+      email,
+      password: passwordHash, // записали хеш в базу
+      dob,
     })
 
-    .catch(next);
+    res.send({
+      id: userData.id,
+      name: userData.name,
+      email: userData.email,
+      dob: userData.dob,
+    }); // вернули объект из базы с записанными в него данными пользователя
+  } catch (err) {
+    res.status(400).json({ message: err.message }); // вернули пользователю json с ошибкой
+  }
 }
 
 const removeUser = (req, res, next) => {
@@ -54,11 +60,11 @@ const removeUser = (req, res, next) => {
         }
       })
 
-        .then(() => res.status(200).send({ message: 'Пользователь успешно удалён.' }))
+        .then(() => res.status(200).json({ message: 'Пользователь успешно удалён.' }))
     })
 
     .catch((err) => {
-      res.status(404).send({ message: `${err.message}` });
+      res.status(404).json({ message: err.message });
     })
 
     .catch(next);
