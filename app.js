@@ -5,6 +5,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const { errors } = require('celebrate');
+const errorHandler = require('./middlewares/errorHandler');
 const usersRouter = require('./routes/users');
 
 const { PORT } = process.env;
@@ -21,24 +22,8 @@ app.use('*', (req, res) => {
   res.status(404).send('Запрашиваемый ресурс не найден.');
 });
 
-app.use(errors()); // обработчик ошибок валидации до запуска контроллера celebrate
-
-// централизованная обработка ошибок
-app.use((error, req, res, next) => {
-  // если ошибка сгенерирована не нами - выставляем статус 500
-  const { statusCode = 500, message } = error;
-
-  res
-    .status(statusCode)
-    .send({
-      // проверяем статус и выставляем сообщение в зависимости от него
-      message: statusCode === 500
-        ? 'На сервере произошла ошибка'
-        : message,
-    });
-
-  next();
-});
+app.use(errors()); // обработчик ошибок валидации до запуска контроллера
+app.use(errorHandler); // централизованный обработчик ошибок
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}: http://localhost:7000`);
