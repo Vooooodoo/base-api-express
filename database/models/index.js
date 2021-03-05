@@ -1,3 +1,4 @@
+// файл автоматически создался с помощью утилиты sequelize-cli
 'use strict';
 
 const fs = require('fs');
@@ -15,7 +16,7 @@ const db = {};
 //   sequelize = new Sequelize(config.database, config.username, config.password, config);
 // }
 
-const sequelize = new Sequelize('postgres://super_user:super3000@127.0.0.1:5432/super_db', config);
+const sequelize = new Sequelize(process.env.DEV_DATABASE_URL, config);
 
 fs
   .readdirSync(__dirname)

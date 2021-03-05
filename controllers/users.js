@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs'); // модуль для хэширования пароля пользователя
-const models = require('../models');
+const models = require('../database/models');
 
 const getUsers = (req, res, next) => {
   models.User.findAll({ raw: true })

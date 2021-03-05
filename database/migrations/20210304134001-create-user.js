@@ -1,4 +1,6 @@
+// файл автоматически создался с помощью утилиты sequelize-cli
 'use strict';
+
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('Users', {
