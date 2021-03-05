@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const { errors } = require('celebrate');
 const errorHandler = require('./middlewares/errorHandler');
-const usersRouter = require('./routes/users');
+const routes = require('./routes');
 
 const { PORT } = process.env;
 
@@ -16,11 +16,7 @@ app.use(helmet());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use('/users', usersRouter);
-
-app.use('*', (req, res) => {
-  res.status(404).send('Запрашиваемый ресурс не найден.');
-});
+app.use(routes);
 
 app.use(errors()); // обработчик ошибок валидации до запуска контроллера
 app.use(errorHandler); // централизованный обработчик ошибок

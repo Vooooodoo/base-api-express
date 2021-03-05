@@ -42,12 +42,24 @@ const createUser = (req, res, next) => {
 }
 
 const removeUser = (req, res, next) => {
-  models.User.destroy({
-    where: {
-      id: req.params.id
-    }
-  })
-    .then(() => res.status(201).send('Пользователь удалён!'))
+  models.User.findByPk(req.params.id)
+    .then(user => {
+      if (!user) {
+        throw new Error('Нет пользователя с таким id.');
+      }
+
+      models.User.destroy({
+        where: {
+          id: req.params.id
+        }
+      })
+
+      .then(() => res.status(200).send('Пользователь успешно удалён.'))
+    })
+
+    .catch((err) => {
+      res.status(404).send(err.message);
+    })
 
     .catch(next);
 }
