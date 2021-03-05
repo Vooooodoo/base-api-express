@@ -2,7 +2,10 @@ const bcrypt = require('bcryptjs'); // модуль для хэшировани�
 const models = require('../database/models');
 
 const getUsers = (req, res, next) => {
-  models.User.findAll({ raw: true })
+  models.User.findAll({
+    raw: true,
+    attributes: { exclude: ['password', 'createdAt', 'updatedAt'] },
+  })
     .then(data => res.send(data))
 
     .catch(next);
