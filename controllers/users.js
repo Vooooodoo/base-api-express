@@ -73,5 +73,5 @@ const removeUser = (req, res, next) => {
 module.exports = {
   getUsers,
   createUser,
-  removeUser
+  removeUser,
 };

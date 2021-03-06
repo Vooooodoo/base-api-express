@@ -1,5 +1,10 @@
 const router = require('express').Router();
 const usersRouter = require('./users');
+const { validateNewUser, validateLogin } = require('../middlewares/reqValidation');
+const { createUser, login } = require('../controllers/users');
+
+router.post('/signup', validateNewUser, createUser);
+router.post('/signin', validateLogin, login);
 
 router.use('/users', usersRouter);
 
