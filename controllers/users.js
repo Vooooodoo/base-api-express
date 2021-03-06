@@ -1,5 +1,8 @@
 const bcrypt = require('bcryptjs'); // модуль для хэширования пароля пользователя
+const jwt = require('jsonwebtoken');
 const models = require('../database/models');
+
+const { NODE_ENV, JWT_SECRET } = process.env;
 
 const getUsers = (req, res, next) => {
   models.User.findAll({
@@ -70,8 +73,37 @@ const removeUser = (req, res, next) => {
     .catch(next);
 }
 
+function login(req, res, next) {
+  const { email, password } = req.body;
+
+  return models.User.findOne({
+    where: {
+      email: email,
+      password: password
+    }
+  })
+
+    .then(user => {
+      const token = jwt.sign(
+        { id: user.id },
+        NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+        { expiresIn: '7d' },
+      );
+
+      res.send({ token });
+    })
+
+    .catch(err => {
+      res.status(401).json({ message: err.message });
+    })
+
+    .catch(next);
+}
+
+
 module.exports = {
   getUsers,
   createUser,
   removeUser,
+  login,
 };
