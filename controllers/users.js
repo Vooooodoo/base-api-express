@@ -7,28 +7,38 @@ const AuthError = require('../errors/AuthError');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
-const getUsers = (req, res, next) => {
-  models.User.findAll({
-    raw: true,
-    attributes: { exclude: ['password', 'createdAt', 'updatedAt'] },
-  })
-    .then(data => res.send(data))
+const getUsers = async (req, res, next) => {
+  try {
+    // ключевое слово await заставит интерпретатор ждать до тех пор,
+    // пока промис справа от await не выполнится,
+    // после чего оно вернёт его результат, и выполнение кода продолжится
+    const allUsers = await models.User.findAll({
+        raw: true,
+        attributes: { exclude: ['password', 'createdAt', 'updatedAt'] },
+      });
 
-    .catch(next);
+    res.send(allUsers);
+    // в случае ошибки выполнение try прерывается и управление переходит в начало блока catch
+  } catch {
+    next();
+  }
 }
 
-const getUser = (req, res, next) => {
-  models.User.findOne({
-    where: { id: req.params.id },
-    attributes: { exclude: ['password', 'createdAt', 'updatedAt'] },
-  })
-    .then(data => res.send(data))
+const getUser = async (req, res, next) => {
+  try {
+    const user = await models.User.findOne({
+        where: { id: req.params.id },
+        attributes: { exclude: ['password', 'createdAt', 'updatedAt'] },
+      });
 
-    .catch(err => {
-      throw new NotFoundError(err.message);
-    })
+    if (!user) {
+      throw new NotFoundError('Нет пользователя с таким id.');
+    }
 
-    .catch(next);
+    res.send(user);
+  } catch {
+    next();
+  }
 }
 
 const createUser = async (req, res, next) => {
@@ -67,72 +77,73 @@ const createUser = async (req, res, next) => {
   }
 }
 
-const removeUser = (req, res, next) => {
-  models.User.findByPk(req.params.id)
-    .then(user => {
-      if (!user) {
-        throw new Error('Нет пользователя с таким id.');
+const removeUser = async (req, res, next) => {
+  try {
+    const user = await models.User.findByPk(req.params.id);
+
+    if (!user) {
+      throw new NotFoundError('Нет пользователя с таким id.');
+    }
+
+    await models.User.destroy({
+      where: {
+        id: req.params.id
       }
+    });
 
-      models.User.destroy({
+    // метод json отправит пользователю json объект
+    res.status(200).json({ message: 'Пользователь успешно удалён.' });
+  } catch {
+    next();
+  }
+}
+
+const setUserInfo = async (req, res, next) => {
+  try {
+    const { name, dob } = req.body;
+
+    const user = await models.User.update({ name, dob }, {
         where: {
-          id: req.params.id
+          id: req.user.id
         }
-      })
-        // метод json отправит пользователю json объект
-        .then(() => res.status(200).json({ message: 'Пользователь успешно удалён.' }))
-    })
+      });
 
-    .catch(err => {
-      throw new NotFoundError(err.message);
-    })
-
-    .catch(next);
-}
-
-function setUserInfo(req, res, next) {
-  const { name, dob } = req.body;
-
-  models.User.update({ name, dob }, {
-    where: {
-      id: req.user.id
+    if (!user) {
+      throw new NotFoundError('Нет пользователя с таким id.');
     }
-  })
-    .then(data => res.send(data))
 
-    .catch(err => {
-      throw new NotFoundError(err.message);
-    })
-
-    .catch(next);
+    res.send(user);
+  } catch {
+    next();
+  }
 }
 
-function login(req, res, next) {
-  const { email, password } = req.body;
+const login = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
 
-  return models.User.findOne({
-    where: {
-      email: email,
-      password: password
+    const user = await models.User.findOne({
+        where: {
+          email: email,
+          password: password,
+        }
+      });
+
+    if (!user) {
+      throw new AuthError('Неверный email или пароль.');
     }
-  })
-    .then(user => {
-      const token = jwt.sign(
-        { id: user.id }, // пэйлоуд токена
-        NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
-        { expiresIn: '7d' },
-      );
 
-      res.send({ token });
-    })
+    const token = jwt.sign(
+      { id: user.id }, // пэйлоуд токена
+      NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+      { expiresIn: '7d' },
+    );
 
-    .catch(err => {
-      throw new AuthError(err.message);
-    })
-
-    .catch(next);
+    res.send({ token });
+  } catch {
+    next();
+  }
 }
-
 
 module.exports = {
   getUsers,

@@ -14,7 +14,7 @@ router.use(auth);
 
 router.use('/users', usersRouter);
 
-router.use('*', (req, res) => {
+router.use('*', () => {
   throw new NotFoundError('Запрашиваемый ресурс не найден.');
 });
 
