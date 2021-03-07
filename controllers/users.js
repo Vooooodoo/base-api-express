@@ -1,6 +1,9 @@
 const bcrypt = require('bcryptjs'); // модуль для хэширования пароля пользователя
 const jwt = require('jsonwebtoken');
 const models = require('../database/models');
+const ValidationError = require('../errors/ValidationError');
+const NotFoundError = require('../errors/NotFoundError');
+const AuthError = require('../errors/AuthError');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
@@ -10,6 +13,20 @@ const getUsers = (req, res, next) => {
     attributes: { exclude: ['password', 'createdAt', 'updatedAt'] },
   })
     .then(data => res.send(data))
+
+    .catch(next);
+}
+
+const getUser = (req, res, next) => {
+  models.User.findOne({
+    where: { id: req.params.id },
+    attributes: { exclude: ['password', 'createdAt', 'updatedAt'] },
+  })
+    .then(data => res.send(data))
+
+    .catch(err => {
+      throw new NotFoundError(err.message);
+    })
 
     .catch(next);
 }
@@ -25,7 +42,7 @@ const createUser = async (req, res, next) => {
     const user = await models.User.findOne({ where: { email: email } });
 
     if (user) {
-      throw new Error('Пользователь с таким email уже существует.');
+      throw new ValidationError('Пользователь с таким email уже существует.');
     }
 
     // запишем хеш пароля в константу с помощью модуля bcrypt в синхронном режиме,
@@ -45,8 +62,8 @@ const createUser = async (req, res, next) => {
       email: userData.email,
       dob: userData.dob,
     }); // вернули объект из базы с записанными в него данными пользователя
-  } catch (err) {
-    res.status(400).json({ message: err.message }); // вернули пользователю json с ошибкой
+  } catch {
+    next();
   }
 }
 
@@ -62,12 +79,29 @@ const removeUser = (req, res, next) => {
           id: req.params.id
         }
       })
-
+        // метод json отправит пользователю json объект
         .then(() => res.status(200).json({ message: 'Пользователь успешно удалён.' }))
     })
 
-    .catch((err) => {
-      res.status(404).json({ message: err.message });
+    .catch(err => {
+      throw new NotFoundError(err.message);
+    })
+
+    .catch(next);
+}
+
+function setUserInfo(req, res, next) {
+  const { name, dob } = req.body;
+
+  models.User.update({ name, dob }, {
+    where: {
+      id: req.user.id
+    }
+  })
+    .then(data => res.send(data))
+
+    .catch(err => {
+      throw new NotFoundError(err.message);
     })
 
     .catch(next);
@@ -82,10 +116,9 @@ function login(req, res, next) {
       password: password
     }
   })
-
     .then(user => {
       const token = jwt.sign(
-        { id: user.id },
+        { id: user.id }, // пэйлоуд токена
         NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
         { expiresIn: '7d' },
       );
@@ -94,7 +127,7 @@ function login(req, res, next) {
     })
 
     .catch(err => {
-      res.status(401).json({ message: err.message });
+      throw new AuthError(err.message);
     })
 
     .catch(next);
@@ -103,7 +136,9 @@ function login(req, res, next) {
 
 module.exports = {
   getUsers,
+  getUser,
   createUser,
   removeUser,
+  setUserInfo,
   login,
 };
