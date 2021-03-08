@@ -6,6 +6,7 @@ const NotFoundError = require('../errors/NotFoundError');
 const AuthError = require('../errors/AuthError');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
+const userNotFoundErr = new NotFoundError('Нет пользователя с таким id.');
 
 const getUsers = async (req, res, next) => {
   try {
@@ -32,7 +33,7 @@ const getUser = async (req, res, next) => {
       });
 
     if (!user) {
-      throw new NotFoundError('Нет пользователя с таким id.');
+      throw userNotFoundErr;
     }
 
     res.send(user);
@@ -66,7 +67,7 @@ const createUser = async (req, res, next) => {
       dob,
     })
 
-    res.send({
+    res.send({ //! проверить успешный статус, должен быть 201
       id: userData.id,
       name: userData.name,
       email: userData.email,
@@ -82,7 +83,7 @@ const removeUser = async (req, res, next) => {
     const user = await models.User.findByPk(req.params.id);
 
     if (!user) {
-      throw new NotFoundError('Нет пользователя с таким id.');
+      throw userNotFoundErr;
     }
 
     await models.User.destroy({
@@ -109,7 +110,7 @@ const setUserInfo = async (req, res, next) => {
       });
 
     if (!user) {
-      throw new NotFoundError('Нет пользователя с таким id.');
+      throw userNotFoundErr;
     }
 
     res.send(user);

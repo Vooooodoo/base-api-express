@@ -12,6 +12,7 @@ router.post('/signin', validateLogin, login);
 // в котором хранится payload jwt токена
 router.use(auth);
 
+// защищённые роуты, которым требуется авторизация
 router.use('/users', usersRouter);
 
 router.use('*', () => {
