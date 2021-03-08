@@ -1,7 +1,6 @@
 // централизованная обработка ошибок
 const errorHandler =  ((error, req, res, next) => {
-  // если ошибка сгенерирована не нами,
-  // через throw new ErrorClass - выставляем статус 500
+  // если ошибка сгенерирована не нами, через throw new ErrorClass - выставляем статус 500
   const { statusCode = 500, message } = error;
 
   res

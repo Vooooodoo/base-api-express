@@ -1,4 +1,4 @@
-// файл автоматически создался с помощью утилиты sequelize-cli
+// файл создался автоматически, с помощью утилиты sequelize-cli
 'use strict';
 
 const { Model } = require('sequelize');

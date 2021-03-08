@@ -16,11 +16,11 @@ module.exports = (req, res, next) => {
 
   try {
     payload = jwt.verify(token, `${NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret'}`);
-  } catch (err) {
+  } catch(err) { //! проверить работоспособность без объекта err
     throw userAuthErr;
   }
 
-  // здесь окажется объект payload, которым мы подписали токен
+  // здесь окажется объект payload, которым мы подписали токен,
   // а именно { id: user.id }, и за счёт миддлвера он окажется в свойстве user
   // всех запросов приложения, так можно идентифицировать запросы конкретного пользователя
   req.user = payload;

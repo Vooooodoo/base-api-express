@@ -1,8 +1,8 @@
 // Use environment variables for config settings.
 // This is because secrets such as passwords should never be part of the source code
 // (and especially not committed to version control).
-// Для работоспособности использовать .sequelizerc файл,
-// в котором можно указать до config.js и его новое расширение.
+// для работоспособности использовать .sequelizerc файл,
+// в котором можно указать путь до config.js и его новое расширение
 require('dotenv').config();
 
 module.exports = {

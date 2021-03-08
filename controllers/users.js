@@ -14,12 +14,13 @@ const getUsers = async (req, res, next) => {
     // пока промис справа от await не выполнится,
     // после чего оно вернёт его результат, и выполнение кода продолжится
     const allUsers = await models.User.findAll({
-        raw: true,
-        attributes: { exclude: ['password', 'createdAt', 'updatedAt'] },
-      });
+      raw: true,
+      attributes: { exclude: ['password', 'createdAt', 'updatedAt'] },
+    });
 
     res.send(allUsers);
-    // в случае ошибки выполнение try прерывается и управление переходит в начало блока catch
+    // в случае ошибки выполнение try прерывается,
+    // создаётся новый экземпляр класса Error и управление переходит в начало блока catch
   } catch {
     next();
   }
@@ -28,9 +29,9 @@ const getUsers = async (req, res, next) => {
 const getUser = async (req, res, next) => {
   try {
     const user = await models.User.findOne({
-        where: { id: req.params.id },
-        attributes: { exclude: ['password', 'createdAt', 'updatedAt'] },
-      });
+      where: { id: req.params.id },
+      attributes: { exclude: ['password', 'createdAt', 'updatedAt'] },
+    });
 
     if (!user) {
       throw userNotFoundErr;
@@ -65,7 +66,7 @@ const createUser = async (req, res, next) => {
       email,
       password: passwordHash, // записали хеш в базу
       dob,
-    })
+    });
 
     res.send({ //! проверить успешный статус, должен быть 201
       id: userData.id,
@@ -86,7 +87,7 @@ const removeUser = async (req, res, next) => {
       throw userNotFoundErr;
     }
 
-    await models.User.destroy({
+    await models.User.destroy({ //! проверить такую конструкцию без константы
       where: {
         id: req.params.id
       }
@@ -104,10 +105,10 @@ const setUserInfo = async (req, res, next) => {
     const { name, dob } = req.body;
 
     const user = await models.User.update({ name, dob }, {
-        where: {
-          id: req.user.id
-        }
-      });
+      where: {
+        id: req.user.id
+      }
+    });
 
     if (!user) {
       throw userNotFoundErr;
@@ -124,18 +125,20 @@ const login = async (req, res, next) => {
     const { email, password } = req.body;
 
     const user = await models.User.findOne({
-        where: {
-          email: email,
-          password: password,
-        }
-      });
+      where: {
+        email: email,
+        password: password,
+      }
+    });
 
     if (!user) {
       throw new AuthError('Неверный email или пароль.');
     }
 
     const token = jwt.sign(
-      { id: user.id }, // пэйлоуд токена
+      // payload токена, по которому в случае успешной авторизации,
+      // будем идентифицировать новые запросы пользователя
+      { id: user.id },
       NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
       { expiresIn: '7d' },
     );

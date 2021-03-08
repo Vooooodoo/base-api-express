@@ -1,4 +1,4 @@
-// файл автоматически создался с помощью утилиты sequelize-cli
+// файл создался автоматически, с помощью утилиты sequelize-cli
 // в нём сохраняется версия модели БД,
 // чтобы в случае чего можно было откатиться к конретной версии модели
 'use strict';
@@ -34,7 +34,7 @@ module.exports = {
       }
     });
   },
-  
+
   down: async (queryInterface, Sequelize) => {
     await queryInterface.dropTable('Users');
   }
