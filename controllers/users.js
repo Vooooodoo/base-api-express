@@ -104,6 +104,8 @@ const setUserInfo = async (req, res, next) => {
   try {
     const { name, dob } = req.body;
 
+    // при успешной авторизации в объекте запроса появится свойство user,
+    // в которое запишется payload токена, его можно использовать в обработчиках
     const user = await models.User.update({ name, dob }, {
       where: {
         id: req.user.id
@@ -136,9 +138,14 @@ const login = async (req, res, next) => {
     }
 
     const token = jwt.sign(
-      // payload токена, по которому в случае успешной авторизации,
-      // будем идентифицировать новые запросы пользователя
+      // payload токена содержит информацию, которую мы будем кодировать
+      // по нему, в случае успешной авторизации,
+      // будем аутентифицировать новые запросы пользователя
       { id: user.id },
+      // node -e "console.log(require('crypto').randomBytes(32).toString('hex'));"
+      // такое выражение сгенерирует 256-битный (32-байтный)
+      // криптостойкий и псевдослучайный ключ и выведет его в консоль
+      // результат нужно использовать в качестве JWT_SECRET
       NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
       { expiresIn: '7d' },
     );
