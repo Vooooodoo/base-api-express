@@ -5,7 +5,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const { errors } = require('celebrate');
-const errorHandler = require('./middlewares/errorHandler');
 const routes = require('./routes');
 
 const { PORT } = process.env;
@@ -19,7 +18,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(routes);
 
 app.use(errors()); // обработчик ошибок валидации до запуска контроллера
-app.use(errorHandler); // централизованный обработчик ошибок
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}: http://localhost:7000`);

@@ -3,7 +3,6 @@ const usersRouter = require('./users');
 const auth = require('../middlewares/auth');
 const { validateNewUser, validateLogin } = require('../middlewares/reqValidation');
 const { createUser, login } = require('../controllers/users');
-const NotFoundError = require('../errors/NotFoundError');
 
 // роуты, которым не требуется авторизация
 router.post('/signup', validateNewUser, createUser);
@@ -16,8 +15,8 @@ router.use(auth);
 // защищённые роуты, которым требуется авторизация
 router.use('/users', usersRouter);
 
-router.use('*', () => {
-  throw new NotFoundError('Запрашиваемый ресурс не найден.');
+router.use('*', (req, res) => {
+  res.status(404).send({ message: 'Запрашиваемый ресурс не найден' });
 });
 
 module.exports = router;

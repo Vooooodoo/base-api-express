@@ -1,14 +1,16 @@
 const bcrypt = require('bcryptjs'); // модуль для хэширования пароля пользователя
 const jwt = require('jsonwebtoken');
 const models = require('../database/models');
+const handleErr = require('../errors/errorHandler');
 const ValidationError = require('../errors/ValidationError');
 const NotFoundError = require('../errors/NotFoundError');
 const AuthError = require('../errors/AuthError');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 const userNotFoundErr = new NotFoundError('Нет пользователя с таким id.');
+const authErr = new AuthError('Неверный email или пароль.');
 
-const getUsers = async (req, res, next) => {
+const getUsers = async (req, res) => {
   try {
     // ключевое слово await заставит интерпретатор ждать до тех пор,
     // пока промис справа от await не выполнится,
@@ -21,13 +23,12 @@ const getUsers = async (req, res, next) => {
     res.send(allUsers);
     // в случае ошибки выполнение try прерывается,
     // создаётся новый экземпляр класса Error и управление переходит в начало блока catch
-  } catch {
-    next();
+  } catch (err) {
+    handleErr(err, req, res);
   }
-
 }
 
-const getUser = async (req, res, next) => {
+const getUser = async (req, res) => {
   try {
     const user = await models.User.findOne({
       where: { id: req.params.id },
@@ -35,16 +36,17 @@ const getUser = async (req, res, next) => {
     });
 
     if (!user) {
+      // объект новой ошибки прилетит в качестве аргумента catch(err)
       throw new NotFoundError('Нет пользователя с таким id.');
     }
 
     res.send(user);
-  } catch {
-    next();
+  } catch(err) {
+    handleErr(err, req, res);
   }
 }
 
-const createUser = async (req, res, next) => {
+const createUser = async (req, res) => {
   try {
     const {
       name,
@@ -69,18 +71,18 @@ const createUser = async (req, res, next) => {
       dob,
     });
 
-    res.send({ //! проверить успешный статус, должен быть 201
+    res.status(201).send({
       id: userData.id,
       name: userData.name,
       email: userData.email,
       dob: userData.dob,
     }); // вернули объект из базы с записанными в него данными пользователя
-  } catch {
-    next();
+  } catch(err) {
+    handleErr(err, req, res);
   }
 }
 
-const removeUser = async (req, res, next) => {
+const removeUser = async (req, res) => {
   try {
     const user = await models.User.findByPk(req.params.id);
 
@@ -88,7 +90,7 @@ const removeUser = async (req, res, next) => {
       throw userNotFoundErr;
     }
 
-    await models.User.destroy({ //! проверить такую конструкцию без константы
+    await models.User.destroy({
       where: {
         id: req.params.id
       }
@@ -96,12 +98,12 @@ const removeUser = async (req, res, next) => {
 
     // метод json отправит пользователю json объект
     res.status(200).json({ message: 'Пользователь успешно удалён.' });
-  } catch {
-    next();
+  } catch(err) {
+    handleErr(err, req, res);
   }
 }
 
-const setUserInfo = async (req, res, next) => {
+const setUserInfo = async (req, res) => {
   try {
     const { name, dob } = req.body;
 
@@ -119,11 +121,11 @@ const setUserInfo = async (req, res, next) => {
 
     res.status(200).json({ message: 'Пользователь успешно обновлён.' });
   } catch {
-    next();
+    handleErr(err, req, res);
   }
 }
 
-const login = async (req, res, next) => {
+const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -133,12 +135,12 @@ const login = async (req, res, next) => {
       }
     });
     if (!user) {
-      throw new AuthError('Неверный email или пароль.');
+      throw authErr;
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      throw new AuthError('Неверный email или пароль.');
+      throw authErr;
     }
 
     const token = jwt.sign(
@@ -155,8 +157,8 @@ const login = async (req, res, next) => {
     );
 
     res.send({ token });
-  } catch {
-    next();
+  } catch(err) {
+    handleErr(err, req, res);
   }
 }
 

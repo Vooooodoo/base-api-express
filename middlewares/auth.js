@@ -1,18 +1,17 @@
 // мидлвер для того, чтобы пользователь не проходил
 // каждый раз аутентификацию (ввод логина и пароля),
 // а был автоматически авторизован на сервисе и сразу получил доступ к личному кабинету
-
 const jwt = require('jsonwebtoken');
-const AuthError = require('../errors/AuthError');
+const handleErr = require('../errors/errorHandler');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
-const userAuthErr = new AuthError('Необходима авторизация.');
 
 module.exports = (req, res, next) => {
   const { authorization } = req.headers;
 
+
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    throw userAuthErr;
+    res.status(401).json({ message: 'Необходима авторизация.' })
   }
 
   const token = authorization.replace('Bearer ', '');
@@ -23,8 +22,8 @@ module.exports = (req, res, next) => {
     // которым этот токен был подписан
     // он возвращает payload, если токен прошёл проверку
     payload = jwt.verify(token, `${NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret'}`);
-  } catch(err) { //! проверить работоспособность без объекта err
-    throw userAuthErr;
+  } catch(err) {
+    handleErr(err, req, res);
   }
 
   // здесь окажется объект payload, который мы передали при создании токена,
