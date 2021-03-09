@@ -34,7 +34,7 @@ const getUser = async (req, res, next) => {
     });
 
     if (!user) {
-      throw userNotFoundErr;
+      throw new NotFoundError('Нет пользователя с таким id.');
     }
 
     res.send(user);
@@ -129,11 +129,14 @@ const login = async (req, res, next) => {
     const user = await models.User.findOne({
       where: {
         email: email,
-        password: password,
       }
     });
-
     if (!user) {
+      throw new AuthError('Неверный email или пароль.');
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
       throw new AuthError('Неверный email или пароль.');
     }
 
