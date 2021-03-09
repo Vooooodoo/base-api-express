@@ -1,4 +1,4 @@
-const bcrypt = require('bcryptjs'); // модуль для хэширования пароля пользователя
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const models = require('../database/models');
 const handleErr = require('../errors/errorHandler');
@@ -12,17 +12,12 @@ const authErr = new AuthError('Неверный email или пароль.');
 
 const getUsers = async (req, res) => {
   try {
-    // ключевое слово await заставит интерпретатор ждать до тех пор,
-    // пока промис справа от await не выполнится,
-    // после чего вернётся результат, и выполнение кода продолжится
     const allUsers = await models.User.findAll({
       raw: true,
       attributes: { exclude: ['password', 'createdAt', 'updatedAt'] },
     });
 
     res.send(allUsers);
-    // в случае ошибки выполнение try прерывается,
-    // создаётся новый экземпляр класса Error и управление переходит в начало блока catch
   } catch (err) {
     handleErr(err, req, res);
   }
@@ -36,12 +31,11 @@ const getUser = async (req, res) => {
     });
 
     if (!user) {
-      // объект новой ошибки прилетит в качестве аргумента err в блок catch
       throw new NotFoundError('Нет пользователя с таким id.');
     }
 
     res.send(user);
-  } catch(err) {
+  } catch (err) {
     handleErr(err, req, res);
   }
 }
@@ -60,14 +54,11 @@ const createUser = async (req, res) => {
       throw new ValidationError('Пользователь с таким email уже существует.');
     }
 
-    // запишем хеш пароля в константу с помощью модуля bcrypt в синхронном режиме,
-    // 10 - это длина «соли», случайной строки,
-    // которую метод добавит к паролю перед хешированием, для безопасности
     const passwordHash = bcrypt.hashSync(password, 10);
     const userData = await models.User.create({
       name,
       email,
-      password: passwordHash, // записали хеш в базу
+      password: passwordHash,
       dob,
     });
 
@@ -76,8 +67,8 @@ const createUser = async (req, res) => {
       name: userData.name,
       email: userData.email,
       dob: userData.dob,
-    }); // вернули объект из базы с записанными в него данными пользователя
-  } catch(err) {
+    });
+  } catch (err) {
     handleErr(err, req, res);
   }
 }
@@ -96,9 +87,8 @@ const removeUser = async (req, res) => {
       }
     });
 
-    // метод json отправит пользователю json объект
     res.status(200).json({ message: 'Пользователь успешно удалён.' });
-  } catch(err) {
+  } catch (err) {
     handleErr(err, req, res);
   }
 }
@@ -107,8 +97,6 @@ const setUserInfo = async (req, res) => {
   try {
     const { name, dob } = req.body;
 
-    // при успешной авторизации в объекте запроса появится свойство user,
-    // в которое запишется payload токена, его можно использовать в обработчиках
     const user = await models.User.update({ name, dob }, {
       where: {
         id: req.user.id,
@@ -120,7 +108,7 @@ const setUserInfo = async (req, res) => {
     }
 
     res.status(200).json({ message: 'Пользователь успешно обновлён.' });
-  } catch {
+  } catch (err) {
     handleErr(err, req, res);
   }
 }
@@ -144,20 +132,13 @@ const login = async (req, res) => {
     }
 
     const token = jwt.sign(
-      // payload токена содержит информацию, которую мы будем кодировать
-      // по нему, в случае успешной авторизации,
-      // будем аутентифицировать новые запросы пользователя
       { id: user.id },
-      // node -e "console.log(require('crypto').randomBytes(32).toString('hex'));"
-      // такое выражение сгенерирует 256-битный (32-байтный)
-      // криптостойкий и псевдослучайный ключ и выведет его в консоль
-      // результат нужно использовать в качестве JWT_SECRET
       NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
       { expiresIn: '7d' },
     );
 
     res.send({ token });
-  } catch(err) {
+  } catch (err) {
     handleErr(err, req, res);
   }
 }

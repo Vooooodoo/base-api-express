@@ -1,4 +1,3 @@
-// файл создался автоматически, с помощью утилиты sequelize-cli
 'use strict';
 
 const { Model } = require('sequelize');

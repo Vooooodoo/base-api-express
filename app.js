@@ -1,5 +1,3 @@
-// dotenv is a module that loads environment variables
-// from a .env file into process.env
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -17,7 +15,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(routes);
 
-app.use(errors()); // обработчик ошибок валидации до запуска контроллера
+app.use(errors());
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}: http://localhost:7000`);
