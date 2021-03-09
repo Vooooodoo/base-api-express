@@ -11,7 +11,7 @@ router.post('/signin', validateLogin, login);
 
 // всё что ниже мидлвера auth получит доступ к объекту req.user
 // в котором хранится payload jwt токена, доступные через req.user
-// router.use(auth);
+router.use(auth);
 
 // защищённые роуты, которым требуется авторизация
 router.use('/users', usersRouter);

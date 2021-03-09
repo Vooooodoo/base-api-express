@@ -24,6 +24,7 @@ const getUsers = async (req, res, next) => {
   } catch {
     next();
   }
+
 }
 
 const getUser = async (req, res, next) => {
@@ -108,8 +109,7 @@ const setUserInfo = async (req, res, next) => {
     // в которое запишется payload токена, его можно использовать в обработчиках
     const user = await models.User.update({ name, dob }, {
       where: {
-        // id: req.user.id,
-        id: 20,
+        id: req.user.id,
       }
     });
 
