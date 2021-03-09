@@ -42,12 +42,7 @@ const getUser = async (req, res) => {
 
 const createUser = async (req, res) => {
   try {
-    const {
-      name,
-      email,
-      password,
-      dob,
-    } = req.body;
+    const { name, email, password, dob } = req.body;
     const user = await models.User.findOne({ where: { email: email } });
 
     if (user) {
@@ -81,11 +76,7 @@ const removeUser = async (req, res) => {
       throw userNotFoundErr;
     }
 
-    await models.User.destroy({
-      where: {
-        id: req.params.id
-      }
-    });
+    await models.User.destroy({ where: { id: req.params.id } });
 
     res.status(200).json({ message: 'Пользователь успешно удалён.' });
   } catch (err) {
@@ -117,11 +108,7 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await models.User.findOne({
-      where: {
-        email: email,
-      }
-    });
+    const user = await models.User.findOne({ where: { email: email } });
     if (!user) {
       throw authErr;
     }

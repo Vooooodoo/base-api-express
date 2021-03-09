@@ -5,11 +5,9 @@ const handleErr =  ((err, req, res) => {
     .status(statusCode)
     .json({
       message: statusCode === 500
-        ? 'На сервере произошла ошибка. Что-то пошло не так.'
+        ? 'На сервере произошла ошибка.'
         : message,
     });
-
-  // next();
 });
 
 module.exports = handleErr;
