@@ -14,7 +14,7 @@ const getUsers = async (req, res) => {
   try {
     // ключевое слово await заставит интерпретатор ждать до тех пор,
     // пока промис справа от await не выполнится,
-    // после чего оно вернёт его результат, и выполнение кода продолжится
+    // после чего вернётся результат, и выполнение кода продолжится
     const allUsers = await models.User.findAll({
       raw: true,
       attributes: { exclude: ['password', 'createdAt', 'updatedAt'] },
@@ -36,7 +36,7 @@ const getUser = async (req, res) => {
     });
 
     if (!user) {
-      // объект новой ошибки прилетит в качестве аргумента catch(err)
+      // объект новой ошибки прилетит в качестве аргумента err в блок catch
       throw new NotFoundError('Нет пользователя с таким id.');
     }
 
