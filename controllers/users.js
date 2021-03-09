@@ -108,7 +108,8 @@ const setUserInfo = async (req, res, next) => {
     // в которое запишется payload токена, его можно использовать в обработчиках
     const user = await models.User.update({ name, dob }, {
       where: {
-        id: req.user.id
+        // id: req.user.id,
+        id: 20,
       }
     });
 
@@ -116,7 +117,7 @@ const setUserInfo = async (req, res, next) => {
       throw userNotFoundErr;
     }
 
-    res.send(user);
+    res.status(200).json({ message: 'Пользователь успешно обновлён.' });
   } catch {
     next();
   }
