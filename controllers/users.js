@@ -80,7 +80,11 @@ const updateUserInfo = async (req, res) => {
 
     res.status(200).json({ message: 'Пользователь успешно обновлён.' });
   } catch (err) {
-    handleErr(err, req, res);
+    if (err.name === 'SequelizeDatabaseError') {
+      res.status(400).json({ message: err.message });
+    } else {
+      handleErr(err, req, res);
+    }
   }
 }
 

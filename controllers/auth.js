@@ -32,7 +32,11 @@ const createUser = async (req, res) => {
       dob: userData.dob,
     });
   } catch (err) {
-    handleErr(err, req, res);
+    if (err.name === 'SequelizeDatabaseError') {
+      res.status(400).json({ message: err.message });
+    } else {
+      handleErr(err, req, res);
+    }
   }
 }
 
