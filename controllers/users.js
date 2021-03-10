@@ -6,6 +6,12 @@ const ForbiddenError = require('../errors/ForbiddenError');
 const userNotFoundErr = new NotFoundError('Нет пользователя с таким id.');
 const forbiddenErr = new ForbiddenError('Недостаточно прав для выполнения операции.');
 
+const checkIsForbiddenRout = (req) => {
+  if (Number(req.params.id) !== req.user.id) {
+    throw forbiddenErr;
+  }
+}
+
 const getUsers = async (req, res) => {
   try {
     const allUsers = await models.User.findAll({
@@ -21,9 +27,7 @@ const getUsers = async (req, res) => {
 
 const getUser = async (req, res) => {
   try {
-    if (Number(req.params.id) !== req.user.id) {
-      throw forbiddenErr;
-    }
+    checkIsForbiddenRout(req);
 
     const user = await models.User.findOne({
       where: { id: req.params.id },
@@ -42,9 +46,7 @@ const getUser = async (req, res) => {
 
 const removeUser = async (req, res) => {
   try {
-    if (Number(req.params.id) !== req.user.id) {
-      throw forbiddenErr;
-    }
+    checkIsForbiddenRout(req);
 
     const user = await models.User.findByPk(req.params.id);
 
@@ -62,9 +64,7 @@ const removeUser = async (req, res) => {
 
 const updateUserInfo = async (req, res) => {
   try {
-    if (Number(req.params.id) !== req.user.id) {
-      throw forbiddenErr;
-    }
+    checkIsForbiddenRout(req);
 
     const { name, email, dob } = req.body;
 
