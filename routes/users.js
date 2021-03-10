@@ -4,12 +4,12 @@ const {
   getUsers,
   getUser,
   removeUser,
-  setUserInfo,
+  updateUserInfo,
 } = require('../controllers/users');
 
 router.get('/', getUsers);
 router.get('/:id', getUser);
-router.patch('/me', validateUserInfo, setUserInfo);
+router.patch('/:id', validateUserInfo, updateUserInfo);
 router.delete('/:id', removeUser);
 
 module.exports = router;

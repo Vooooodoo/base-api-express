@@ -14,7 +14,7 @@ const getUsers = async (req, res) => {
   try {
     const allUsers = await models.User.findAll({
       raw: true,
-      attributes: { exclude: ['password', 'createdAt', 'updatedAt'] },
+      attributes: { exclude: ['password'] },
     });
 
     res.send(allUsers);
@@ -27,7 +27,7 @@ const getUser = async (req, res) => {
   try {
     const user = await models.User.findOne({
       where: { id: req.params.id },
-      attributes: { exclude: ['password', 'createdAt', 'updatedAt'] },
+      attributes: { exclude: ['password'] },
     });
 
     if (!user) {
@@ -84,13 +84,13 @@ const removeUser = async (req, res) => {
   }
 }
 
-const setUserInfo = async (req, res) => {
+const updateUserInfo = async (req, res) => {
   try {
-    const { name, dob } = req.body;
+    const { name, email, dob } = req.body;
 
-    const user = await models.User.update({ name, dob }, {
+    const user = await models.User.update({ name, email, dob }, {
       where: {
-        id: req.user.id,
+        id: req.params.id,
       }
     });
 
@@ -135,6 +135,6 @@ module.exports = {
   getUser,
   createUser,
   removeUser,
-  setUserInfo,
+  updateUserInfo,
   login,
 };
