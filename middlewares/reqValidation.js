@@ -1,5 +1,11 @@
 const { celebrate, Joi } = require('celebrate');
 
+const validateId = celebrate({
+  params: Joi.object().keys({
+    id: Joi.number().required(),
+  }),
+});
+
 const validateNewUser = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
@@ -24,4 +30,4 @@ const validateUserInfo = celebrate({
   }),
 });
 
-module.exports = { validateNewUser, validateLogin, validateUserInfo };
+module.exports = { validateId, validateNewUser, validateLogin, validateUserInfo };
