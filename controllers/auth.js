@@ -8,7 +8,7 @@ const AuthError = require('../errors/AuthError');
 const { NODE_ENV, SALT, JWT_SECRET } = process.env;
 const authErr = new AuthError('Неверный email или пароль.');
 
-const createUser = async (req, res) => {
+const signUp = async (req, res) => {
   try {
     const { name, email, password, dob } = req.body;
     const user = await models.User.findOne({ where: { email } });
@@ -17,19 +17,23 @@ const createUser = async (req, res) => {
       throw new ValidationError('Пользователь с таким email уже существует.');
     }
 
-    const passwordHash = bcrypt.hashSync(password, SALT);
+    const passwordHash = bcrypt.hashSync(password, Number(SALT));
     let userData = await models.User.create({
       name,
       email,
       password: passwordHash,
       dob,
     });
+    //! уточнить в каком формате приходят данные с базы
+    //! именно поэтому надо парсить в JSON, чтобы можно было удалить свойство
+    //! и что это за метод, посмотреть отличия с JSON.stringify()
+    //! почитать больше про JSON, плаваешь
     userData = userData.toJSON();
     delete userData.password;
 
     res.status(201).send({
       user: userData,
-      token: ''
+      token: '' //! зачем здесь токен передавать, ведь мы его передаём на этапе signIn?
     });
   } catch (err) {
     if (err.name === 'SequelizeDatabaseError') {
@@ -39,7 +43,7 @@ const createUser = async (req, res) => {
   }
 }
 
-const login = async (req, res) => {
+const signIn = async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -65,4 +69,4 @@ const login = async (req, res) => {
   }
 }
 
-module.exports = { createUser, login };
+module.exports = { signUp, signIn };

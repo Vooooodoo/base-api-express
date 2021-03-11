@@ -18,5 +18,5 @@ app.use(routes);
 app.use(errors());
 
 app.listen(PORT, () => {
-  console.log(`App listening on port ${PORT}: http://localhost:7000`);
+  console.log(`App listening on port ${PORT}`);
 });
