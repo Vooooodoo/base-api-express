@@ -6,6 +6,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Users');
+    await queryInterface.changeColumn('Users', 'dob', { type: Sequelize.STRING });
   }
 };
