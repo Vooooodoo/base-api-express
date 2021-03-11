@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const { validateUserInfo } = require('../middlewares/reqValidation');
+const { checkIsForbiddenRout } = require('../middlewares/isForbiddenRout');
 const {
   getUsers,
   getUser,
@@ -8,8 +9,8 @@ const {
 } = require('../controllers/users');
 
 router.get('/', getUsers);
-router.get('/:id', getUser);
-router.patch('/:id', validateUserInfo, updateUserInfo);
-router.delete('/:id', removeUser);
+router.get('/:id', checkIsForbiddenRout, getUser);
+router.patch('/:id', checkIsForbiddenRout, validateUserInfo, updateUserInfo);
+router.delete('/:id', checkIsForbiddenRout, removeUser);
 
 module.exports = router;
