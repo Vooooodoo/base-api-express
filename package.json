@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "migrate": "sequelize-cli db:migrate"
+    "migrate": "sequelize-cli db:migrate",
+    "undo-migrate": "sequelize-cli db:migrate:undo",
+    "seeds": "sequelize-cli db:seed:all"
     },
   "author": "Andrukhanenko Roman",
   "license": "ISC",

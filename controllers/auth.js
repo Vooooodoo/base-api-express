@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const models = require('../database/models');
+const models = require('../db/models');
 const handleErr = require('../errors/errorHandler');
 const ValidationError = require('../errors/ValidationError');
 const AuthError = require('../errors/AuthError');

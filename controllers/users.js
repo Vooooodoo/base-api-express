@@ -1,4 +1,4 @@
-const models = require('../database/models');
+const models = require('../db/models');
 const handleErr = require('../errors/errorHandler');
 const NotFoundError = require('../errors/NotFoundError');
 
