@@ -4,7 +4,7 @@ const NotFoundError = require('../errors/NotFoundError');
 
 const userNotFoundErr = new NotFoundError('Нет пользователя с таким id.');
 
-const getUsers = async (req, res, next) => {
+module.exports.getUsers = async (req, res, next) => {
   try {
     const allUsers = await models.User.findAll({
       raw: true,
@@ -18,7 +18,7 @@ const getUsers = async (req, res, next) => {
   }
 }
 
-const getUser = async (req, res) => {
+module.exports.getUser = async (req, res) => {
   try {
     const user = await models.User.findOne({
       where: { id: req.params.id },
@@ -35,7 +35,7 @@ const getUser = async (req, res) => {
   }
 }
 
-const removeUser = async (req, res) => {
+module.exports.removeUser = async (req, res) => {
   try {
     const user = await models.User.findByPk(req.params.id);
 
@@ -51,7 +51,7 @@ const removeUser = async (req, res) => {
   }
 }
 
-const updateUserInfo = async (req, res) => {
+module.exports.updateUserInfo = async (req, res) => {
   try {
     const { name, email, dob } = req.body;
 
@@ -74,10 +74,3 @@ const updateUserInfo = async (req, res) => {
     }
   }
 }
-
-module.exports = {
-  getUsers,
-  getUser,
-  removeUser,
-  updateUserInfo,
-};
