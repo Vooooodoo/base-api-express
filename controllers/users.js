@@ -4,7 +4,7 @@ const NotFoundError = require('../errors/NotFoundError');
 
 const userNotFoundErr = new NotFoundError('Нет пользователя с таким id.');
 
-const getUsers = async (req, res) => {
+const getUsers = async (req, res, next) => {
   try {
     const allUsers = await models.User.findAll({
       raw: true,
@@ -14,6 +14,7 @@ const getUsers = async (req, res) => {
     res.send(allUsers);
   } catch (err) {
     handleErr(err, req, res);
+    next(err)
   }
 }
 

@@ -5,38 +5,37 @@ const handleErr = require('../errors/errorHandler');
 const ValidationError = require('../errors/ValidationError');
 const AuthError = require('../errors/AuthError');
 
-const { NODE_ENV, JWT_SECRET } = process.env;
+const { NODE_ENV, SALT, JWT_SECRET } = process.env;
 const authErr = new AuthError('Неверный email или пароль.');
 
 const createUser = async (req, res) => {
   try {
     const { name, email, password, dob } = req.body;
-    const user = await models.User.findOne({ where: { email: email } });
+    const user = await models.User.findOne({ where: { email } });
 
     if (user) {
       throw new ValidationError('Пользователь с таким email уже существует.');
     }
 
-    const passwordHash = bcrypt.hashSync(password, 10);
-    const userData = await models.User.create({
+    const passwordHash = bcrypt.hashSync(password, SALT);
+    let userData = await models.User.create({
       name,
       email,
       password: passwordHash,
       dob,
     });
+    userData = userData.toJSON();
+    delete userData.password;
 
     res.status(201).send({
-      id: userData.id,
-      name: userData.name,
-      email: userData.email,
-      dob: userData.dob,
+      user: userData,
+      token: ''
     });
   } catch (err) {
     if (err.name === 'SequelizeDatabaseError') {
-      res.status(400).json({ message: err.message });
-    } else {
-      handleErr(err, req, res);
+      return res.status(400).json({ message: err.message });
     }
+    handleErr(err, req, res);
   }
 }
 
@@ -44,7 +43,7 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await models.User.findOne({ where: { email: email } });
+    const user = await models.User.findOne({ where: { email } });
     if (!user) {
       throw authErr;
     }
