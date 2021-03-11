@@ -5,8 +5,8 @@ const auth = require('../middlewares/auth');
 const { validateNewUser, validateLogin } = require('../middlewares/reqValidation');
 const { createUser, login } = require('../controllers/auth');
 
-router.post('/signup', validateNewUser, createUser);
-router.post('/signin', validateLogin, login);
+router.post('/sign-up', validateNewUser, createUser);
+router.post('/sign-in', validateLogin, login);
 
 router.use(auth);
 
