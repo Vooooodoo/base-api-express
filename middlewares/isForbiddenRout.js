@@ -6,4 +6,4 @@ const checkIsForbiddenRout = (req, res, next) => {
   next();
 }
 
-module.exports = { checkIsForbiddenRout };
+module.exports = checkIsForbiddenRout;

@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { validateUserInfo } = require('../middlewares/reqValidation');
-const { checkIsForbiddenRout } = require('../middlewares/isForbiddenRout');
+const checkIsForbiddenRout = require('../middlewares/isForbiddenRout');
 const {
   getUsers,
   getUser,
