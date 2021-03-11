@@ -2,7 +2,7 @@ const models = require('../db/models');
 const handleErr = require('../errors/errorHandler');
 const NotFoundError = require('../errors/NotFoundError');
 
-const userNotFoundErr = new NotFoundError('Нет пользователя с таким id.');
+const userNotFoundErr = new NotFoundError('There is no user with this id.');
 
 module.exports.getUsers = async (req, res, next) => {
   try {
@@ -45,7 +45,7 @@ module.exports.removeUser = async (req, res) => {
 
     await models.User.destroy({ where: { id: req.params.id } });
 
-    res.status(200).json({ message: 'Пользователь успешно удалён.' });
+    res.status(200).json({ message: 'The user was successfully deleted.' });
   } catch (err) {
     handleErr(err, req, res);
   }
@@ -65,7 +65,7 @@ module.exports.updateUserInfo = async (req, res) => {
       throw userNotFoundErr;
     }
 
-    res.status(200).json({ message: 'Пользователь успешно обновлён.' });
+    res.status(200).json({ message: 'The user was successfully updated.' });
   } catch (err) {
     if (err.name === 'SequelizeDatabaseError') {
       res.status(400).json({ message: err.message });

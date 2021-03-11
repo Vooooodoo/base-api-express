@@ -6,7 +6,7 @@ const ValidationError = require('../errors/ValidationError');
 const AuthError = require('../errors/AuthError');
 
 const { NODE_ENV, SALT, JWT_SECRET } = process.env;
-const authErr = new AuthError('Неверный email или пароль.');
+const authErr = new AuthError('Invalid email or password.');
 
 const signUp = async (req, res) => {
   try {
@@ -14,7 +14,7 @@ const signUp = async (req, res) => {
     const user = await models.User.findOne({ where: { email } });
 
     if (user) {
-      throw new ValidationError('Пользователь с таким email уже существует.');
+      throw new ValidationError('A user with this email already exists.');
     }
 
     const passwordHash = bcrypt.hashSync(password, Number(SALT));
@@ -37,8 +37,10 @@ const signUp = async (req, res) => {
     });
   } catch (err) {
     if (err.name === 'SequelizeDatabaseError') {
+      //! уточнить зачем ставить return в асихронных if
       return res.status(400).json({ message: err.message });
     }
+
     handleErr(err, req, res);
   }
 }

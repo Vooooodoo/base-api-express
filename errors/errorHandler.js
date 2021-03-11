@@ -5,7 +5,7 @@ const handleErr =  ((err, req, res) => {
     .status(statusCode)
     .json({
       message: statusCode === 500
-        ? 'На сервере произошла ошибка.'
+        ? 'An error occurred on the server.'
         : message,
     });
 });
