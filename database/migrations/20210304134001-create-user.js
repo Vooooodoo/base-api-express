@@ -19,7 +19,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       dob: {
-        type: Sequelize.STRING
+        type: Sequelize.DATEONLY
       },
       createdAt: {
         allowNull: false,
