@@ -2,20 +2,23 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const models = require('../db/models');
 const handleErr = require('../errors/errorHandler');
-const ValidationError = require('../errors/ValidationError');
 const AuthError = require('../errors/AuthError');
+const ValidationError = require('../errors/ValidationError');
 
 const { NODE_ENV, SALT, JWT_SECRET } = process.env;
 const authErr = new AuthError('Invalid email or password.');
 
+const checkPassword = (pass) => {
+  if (!pass || !pass.trim() || pass.length < 8) {
+    throw new ValidationError('Invalid password.');
+  }
+}
+
 const signUp = async (req, res) => {
   try {
     const { name, email, password, dob } = req.body;
-    const user = await models.User.findOne({ where: { email } });
 
-    if (user) {
-      throw new ValidationError('A user with this email already exists.');
-    }
+    checkPassword(password);
 
     const passwordHash = bcrypt.hashSync(password, Number(SALT));
     let userData = await models.User.create({
@@ -24,11 +27,7 @@ const signUp = async (req, res) => {
       password: passwordHash,
       dob,
     });
-    //! уточнить в каком формате приходят данные с базы
-    //! именно поэтому надо парсить в JSON, чтобы можно было удалить свойство
-    //! и что это за метод, посмотреть отличия с JSON.stringify()
-    //! почитать больше про JSON, плаваешь
-    userData = userData.toJSON();
+    userData = userData.toJSON(); //! почему не JSON.stringify()?
     delete userData.password;
 
     res.status(201).send({
@@ -36,9 +35,12 @@ const signUp = async (req, res) => {
       token: '' //! зачем здесь токен передавать, ведь мы его передаём на этапе signIn?
     });
   } catch (err) {
-    if (err.name === 'SequelizeDatabaseError') {
-      //! уточнить зачем ставить return в асихронных if
-      return res.status(400).json({ message: err.message });
+    if (
+      err.name === 'SequelizeDatabaseError' ||
+      err.name === 'SequelizeUniqueConstraintError' ||
+      err.name === 'SequelizeValidationError'
+    ) {
+      return res.status(400).json({ message: err.message }); //!
     }
 
     handleErr(err, req, res);

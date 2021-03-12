@@ -15,12 +15,38 @@ module.exports = (sequelize, DataTypes) => {
   };
 
   User.init({
-    name: DataTypes.STRING,
-    email: {
-      type: DataTypes.STRING
+    name: {
+      // constraint отправит SQL запрос, который вернёт ошибку БД, в случае невалидного поля
+      allowNull: false,
+      type: DataTypes.STRING,
+      // validation даже не даст отправить SQL запрос,
+      // в случае невалидного поля, ошибка вернётся на уровне JS
+      validate: {
+        len: [2, 30],
+      }
     },
-    password: DataTypes.STRING,
-    dob: DataTypes.DATEONLY,
+    email: {
+      allowNull: false,
+      unique: true,
+      type: DataTypes.STRING,
+      validate: {
+        isEmail: true,
+      },
+    },
+    password: {
+      allowNull: false,
+      type: DataTypes.STRING,
+      validate: {
+        min: 8,
+      },
+    },
+    dob: {
+      allowNull: false,
+      type: DataTypes.DATEONLY,
+      validate: {
+        len: [8, 20],
+      },
+    }
   }, {
     sequelize,
     modelName: 'User',
