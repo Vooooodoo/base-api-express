@@ -3,15 +3,20 @@ const jwt = require('jsonwebtoken');
 const models = require('../db/models');
 const config = require('../config');
 const AuthError = require('../errors/AuthError');
+const ValidationError = require('../errors/ValidationError');
 
-const { NODE_ENV, JWT_SECRET, JWT_EXPIRES_IN, PASSWORD_HASH_SALT } = process.env;
 const authErr = new AuthError('Invalid email or password.');
 
 const signUp = async (req, res, next) => {
   try {
     const { name, email, password, dob } = req.body;
+    const user = await models.User.findOne({ where: { email: email } });
 
-    const passwordHash = bcrypt.hashSync(password, Number(PASSWORD_HASH_SALT));
+    if (user) {
+      throw new ValidationError('Пользователь с таким email уже существует.');
+    }
+
+    const passwordHash = bcrypt.hashSync(password, Number(config.passwordHash.salt));
     let userData = await models.User.create({
       name,
       email,
@@ -46,8 +51,8 @@ const signIn = async (req, res, next) => {
 
     const token = jwt.sign(
       { id: user.id },
-      NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
-      { expiresIn: JWT_EXPIRES_IN },
+      config.nodeEnv === 'production' ? config.jwt.secret : 'dev-secret',
+      { expiresIn: config.jwt.expiresIn },
     );
 
     res.send({ token });

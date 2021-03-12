@@ -1,36 +1,10 @@
-// const dotenv = require('dotenv');
-require('dotenv');
-
-// const envTypes = {
-//   dev: 'development',
-//   prod: 'production'
-// }
-
-// const envType = process.env.NODE_ENV || 'development';
-
-// const config = dotenv.parse();
-
-
-
-// let parsedEnv;
-// switch (envType) {
-//   case envTypes.prod:
-
-//     break;
-
-//   default:
-//     break;
-// }
-
-// config.isDev = envType === 'development';
-
 const config = {
-  isDev: process.env.NODE_ENV === 'development',
+  nodeEnv: process.env.NODE_ENV,
   port: process.env.PORT,
   db: {
     devUrl: process.env.DEV_DB_URL,
   },
-  token: {
+  jwt: {
     secret: process.env.JWT_SECRET,
     expiresIn: process.env.JWT_EXPIRES_IN,
   },

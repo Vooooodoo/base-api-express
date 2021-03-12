@@ -1,8 +1,8 @@
-require('dotenv').config();
+const config = require('../../config');
 
 module.exports = {
   development: {
-    url: process.env.DEV_DB_URL,
+    url: config.db.devUrl,
     dialect: 'postgres',
   },
 };
