@@ -1,6 +1,5 @@
 const models = require('../db/models');
 const NotFoundError = require('../errors/NotFoundError');
-const ValidationError = require('../errors/ValidationError');
 
 const userNotFoundErr = new NotFoundError('There is no user with this id.');
 
@@ -64,15 +63,6 @@ module.exports.updateUserInfo = async (req, res, next) => {
 
     res.status(200).json({ message: 'The user was successfully updated.' });
   } catch (err) {
-    if (
-      err.name === 'SequelizeDatabaseError' ||
-      err.name === 'SequelizeUniqueConstraintError' ||
-      err.name === 'SequelizeValidationError'
-    ) {
-      // throw new ValidationError(err.message);
-      return res.status(400).json({ message: err.message });
-    }
-
     next(err);
   }
 }

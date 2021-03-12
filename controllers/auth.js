@@ -3,22 +3,13 @@ const jwt = require('jsonwebtoken');
 const models = require('../db/models');
 const config = require('../config');
 const AuthError = require('../errors/AuthError');
-const ValidationError = require('../errors/ValidationError');
 
-const { NODE_ENV, PASSWORD_HASH_SALT, JWT_SECRET } = process.env;
+const { NODE_ENV, JWT_SECRET, JWT_EXPIRES_IN, PASSWORD_HASH_SALT } = process.env;
 const authErr = new AuthError('Invalid email or password.');
-
-const checkPassword = (pass) => {
-  if (!pass || !pass.trim() || pass.length < 8) {
-    throw new ValidationError('Invalid password.');
-  }
-}
 
 const signUp = async (req, res, next) => {
   try {
     const { name, email, password, dob } = req.body;
-
-    checkPassword(password);
 
     const passwordHash = bcrypt.hashSync(password, Number(PASSWORD_HASH_SALT));
     let userData = await models.User.create({
@@ -32,15 +23,6 @@ const signUp = async (req, res, next) => {
 
     res.status(201).send(userData);
   } catch (err) {
-    if (
-      err.name === 'SequelizeDatabaseError' || //!
-      err.name === 'SequelizeUniqueConstraintError' ||
-      err.name === 'SequelizeValidationError'
-    ) {
-      // throw new ValidationError('');
-      return res.status(400).json({ message: err.message });
-    }
-
     next(err);
   }
 }
@@ -65,7 +47,7 @@ const signIn = async (req, res, next) => {
     const token = jwt.sign(
       { id: user.id },
       NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
-      { expiresIn: '7d' },
+      { expiresIn: JWT_EXPIRES_IN },
     );
 
     res.send({ token });

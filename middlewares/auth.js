@@ -23,12 +23,4 @@ module.exports = (req, res, next) => {
   req.user = payload;
 
   next();
-
-  // try {
-  //   const token = (req.headers.authorization || '').replace(/Bearer /, '');
-
-  //   const payload = jwt
-  // } catch (err) {
-
-  // }
 };
