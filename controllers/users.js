@@ -69,8 +69,8 @@ module.exports.updateUserInfo = async (req, res, next) => {
       err.name === 'SequelizeUniqueConstraintError' ||
       err.name === 'SequelizeValidationError'
     ) {
-      throw new ValidationError(err.message);
-      //! return res.status(400).json({ message: err.message });
+      // throw new ValidationError(err.message);
+      return res.status(400).json({ message: err.message });
     }
 
     next(err);

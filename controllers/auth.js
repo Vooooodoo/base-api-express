@@ -1,10 +1,11 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const models = require('../db/models');
+const config = require('../config');
 const AuthError = require('../errors/AuthError');
 const ValidationError = require('../errors/ValidationError');
 
-const { NODE_ENV, SALT, JWT_SECRET } = process.env;
+const { NODE_ENV, PASSWORD_HASH_SALT, JWT_SECRET } = process.env;
 const authErr = new AuthError('Invalid email or password.');
 
 const checkPassword = (pass) => {
@@ -19,28 +20,25 @@ const signUp = async (req, res, next) => {
 
     checkPassword(password);
 
-    const passwordHash = bcrypt.hashSync(password, Number(SALT));
+    const passwordHash = bcrypt.hashSync(password, Number(PASSWORD_HASH_SALT));
     let userData = await models.User.create({
       name,
       email,
       password: passwordHash,
       dob,
     });
-    userData = userData.toJSON(); //! почему не JSON.stringify()?
+    userData = userData.toJSON();
     delete userData.password;
 
-    res.status(201).send({
-      user: userData,
-      token: '' //! зачем здесь токен передавать, ведь мы его передаём на этапе signIn?
-    });
+    res.status(201).send(userData);
   } catch (err) {
     if (
       err.name === 'SequelizeDatabaseError' || //!
       err.name === 'SequelizeUniqueConstraintError' ||
       err.name === 'SequelizeValidationError'
     ) {
-      throw new ValidationError(err.message);
-      //! return res.status(400).json({ message: err.message });
+      // throw new ValidationError('');
+      return res.status(400).json({ message: err.message });
     }
 
     next(err);
