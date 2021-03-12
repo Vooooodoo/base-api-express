@@ -8,13 +8,12 @@ module.exports.getUsers = async (req, res, next) => {
   try {
     const allUsers = await models.User.findAll({
       raw: true,
-      attributes: { exclude: ['password'] },
     });
 
     res.send(allUsers);
   } catch (err) {
     handleErr(err, req, res);
-    next(err)
+    next(err) //! централизованный обработчик ошибок
   }
 }
 
@@ -22,7 +21,6 @@ module.exports.getUser = async (req, res) => {
   try {
     const user = await models.User.findOne({
       where: { id: req.params.id },
-      attributes: { exclude: ['password'] },
     });
 
     if (!user) {
