@@ -1,7 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const models = require('../db/models');
-const handleErr = require('../errors/errorHandler');
 const AuthError = require('../errors/AuthError');
 const ValidationError = require('../errors/ValidationError');
 
@@ -14,7 +13,7 @@ const checkPassword = (pass) => {
   }
 }
 
-const signUp = async (req, res) => {
+const signUp = async (req, res, next) => {
   try {
     const { name, email, password, dob } = req.body;
 
@@ -36,22 +35,26 @@ const signUp = async (req, res) => {
     });
   } catch (err) {
     if (
-      err.name === 'SequelizeDatabaseError' ||
+      err.name === 'SequelizeDatabaseError' || //!
       err.name === 'SequelizeUniqueConstraintError' ||
       err.name === 'SequelizeValidationError'
     ) {
-      return res.status(400).json({ message: err.message }); //!
+      throw new ValidationError(err.message);
+      //! return res.status(400).json({ message: err.message });
     }
 
-    handleErr(err, req, res);
+    next(err);
   }
 }
 
-const signIn = async (req, res) => {
+const signIn = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    const user = await models.User.findOne({ where: { email } });
+    const user = await models.User.findOne({
+      where: { email },
+      attributes: { include: ['password'] }
+    });
     if (!user) {
       throw authErr;
     }
@@ -69,7 +72,7 @@ const signIn = async (req, res) => {
 
     res.send({ token });
   } catch (err) {
-    handleErr(err, req, res);
+    next(err);
   }
 }
 

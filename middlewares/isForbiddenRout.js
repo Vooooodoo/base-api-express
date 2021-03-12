@@ -1,6 +1,8 @@
+const ForbiddenError = require('../errors/ForbiddenError');
+
 const checkIsForbiddenRout = (req, res, next) => {
   if (Number(req.params.id) !== req.user.id) {
-    res.status(403).json({ message: 'Insufficient permissions to perform the operation.' });
+    throw new ForbiddenError('Insufficient permissions to perform the operation.');
   }
 
   next();

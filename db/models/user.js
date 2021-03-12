@@ -51,6 +51,7 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'User',
     defaultScope: {
+      // внесём поле password в исключения, чтобы оно никогда не возвращалось с БД
       attributes: { exclude: ['password'] }
     },
   });

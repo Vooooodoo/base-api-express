@@ -1,6 +1,6 @@
 const models = require('../db/models');
-const handleErr = require('../errors/errorHandler');
 const NotFoundError = require('../errors/NotFoundError');
+const ValidationError = require('../errors/ValidationError');
 
 const userNotFoundErr = new NotFoundError('There is no user with this id.');
 
@@ -12,12 +12,11 @@ module.exports.getUsers = async (req, res, next) => {
 
     res.send(allUsers);
   } catch (err) {
-    handleErr(err, req, res);
-    next(err) //! централизованный обработчик ошибок
+    next(err);
   }
 }
 
-module.exports.getUser = async (req, res) => {
+module.exports.getUser = async (req, res, next) => {
   try {
     const user = await models.User.findOne({
       where: { id: req.params.id },
@@ -29,11 +28,11 @@ module.exports.getUser = async (req, res) => {
 
     res.send(user);
   } catch (err) {
-    handleErr(err, req, res);
+    next(err);
   }
 }
 
-module.exports.removeUser = async (req, res) => {
+module.exports.removeUser = async (req, res, next) => {
   try {
     const user = await models.User.findByPk(req.params.id);
 
@@ -45,11 +44,11 @@ module.exports.removeUser = async (req, res) => {
 
     res.status(200).json({ message: 'The user was successfully deleted.' });
   } catch (err) {
-    handleErr(err, req, res);
+    next(err);
   }
 }
 
-module.exports.updateUserInfo = async (req, res) => {
+module.exports.updateUserInfo = async (req, res, next) => {
   try {
     const { name, email, dob } = req.body;
 
@@ -65,10 +64,15 @@ module.exports.updateUserInfo = async (req, res) => {
 
     res.status(200).json({ message: 'The user was successfully updated.' });
   } catch (err) {
-    if (err.name === 'SequelizeDatabaseError') {
-      res.status(400).json({ message: err.message });
-    } else {
-      handleErr(err, req, res);
+    if (
+      err.name === 'SequelizeDatabaseError' ||
+      err.name === 'SequelizeUniqueConstraintError' ||
+      err.name === 'SequelizeValidationError'
+    ) {
+      throw new ValidationError(err.message);
+      //! return res.status(400).json({ message: err.message });
     }
+
+    next(err);
   }
 }
