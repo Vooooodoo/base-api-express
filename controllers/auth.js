@@ -1,7 +1,8 @@
-const bcrypt = require('bcryptjs');
+// const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const models = require('../db/models');
 const config = require('../config');
+const { generatePassHash, comparePasswords } = require('../utils/passwordHash');
 const AuthError = require('../errors/AuthError');
 const ValidationError = require('../errors/ValidationError');
 
@@ -13,10 +14,10 @@ const signUp = async (req, res, next) => {
     const user = await models.User.findOne({ where: { email: email } });
 
     if (user) {
-      throw new ValidationError('Пользователь с таким email уже существует.');
+      throw new ValidationError('A user with this email already exists.');
     }
 
-    const passwordHash = bcrypt.hashSync(password, Number(config.passwordHash.salt));
+    const passwordHash = generatePassHash(password, config.passwordHash.salt);
     let userData = await models.User.create({
       name,
       email,
@@ -44,7 +45,7 @@ const signIn = async (req, res, next) => {
       throw authErr;
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = comparePasswords(password, user.password);
     if (!isMatch) {
       throw authErr;
     }
