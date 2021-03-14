@@ -1,5 +1,6 @@
-const jwt = require('jsonwebtoken');
-const config = require('../config');
+// const jwt = require('jsonwebtoken');
+// const config = require('../config');
+const { verifyToken } = require('../utils/token');
 const AuthError = require('../errors/AuthError');
 
 const authErr = new AuthError('Authorization is required.');
@@ -15,10 +16,7 @@ module.exports = (req, res, next) => {
   let payload;
 
   try {
-    payload = jwt.verify(
-      token,
-      `${config.nodeEnv === 'production' ? config.jwt.secret : 'dev-secret'}`
-    );
+    payload = verifyToken(token);
   } catch (err) {
     throw authErr;
   }

@@ -1,11 +1,19 @@
-const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const config = require('../config');
 
-const generatePassHash = (pass, salt) => {
-  return bcrypt.hashSync(pass, Number(salt));
+const createToken = (userId) => {
+  jwt.sign(
+    { id: userId },
+    config.nodeEnv === 'production' ? config.jwt.secret : 'dev-secret',
+    { expiresIn: config.jwt.expiresIn },
+  );
 }
 
-const comparePasswords = async () => {
-  await bcrypt.compare(reqPass, dbPass);
+const verifyToken = (token) => {
+  jwt.verify(
+    token,
+    `${config.nodeEnv === 'production' ? config.jwt.secret : 'dev-secret'}`
+  );
 }
 
-module.exports = { generatePassHash, comparePasswords };
+module.exports = { createToken, verifyToken };

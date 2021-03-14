@@ -1,8 +1,8 @@
 // const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+// const jwt = require('jsonwebtoken');
 const models = require('../db/models');
-const config = require('../config');
 const { generatePassHash, comparePasswords } = require('../utils/passwordHash');
+const { createToken } = require('../utils/token');
 const AuthError = require('../errors/AuthError');
 const ValidationError = require('../errors/ValidationError');
 
@@ -17,7 +17,7 @@ const signUp = async (req, res, next) => {
       throw new ValidationError('A user with this email already exists.');
     }
 
-    const passwordHash = generatePassHash(password, config.passwordHash.salt);
+    const passwordHash = generatePassHash(password);
     let userData = await models.User.create({
       name,
       email,
@@ -50,11 +50,7 @@ const signIn = async (req, res, next) => {
       throw authErr;
     }
 
-    const token = jwt.sign(
-      { id: user.id },
-      config.nodeEnv === 'production' ? config.jwt.secret : 'dev-secret',
-      { expiresIn: config.jwt.expiresIn },
-    );
+    const token = createToken(user.id);
 
     res.send({ token });
   } catch (err) {

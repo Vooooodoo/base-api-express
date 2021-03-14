@@ -1,10 +1,11 @@
 const bcrypt = require('bcryptjs');
+const config = require('../config');
 
-const generatePassHash = (pass, salt) => {
-  return bcrypt.hashSync(pass, Number(salt));
+const generatePassHash = (pass) => {
+  return bcrypt.hashSync(pass, Number(config.passwordHash.salt));
 }
 
-const comparePasswords = async () => {
+const comparePasswords = async (reqPass, dbPass) => {
   await bcrypt.compare(reqPass, dbPass);
 }
 
