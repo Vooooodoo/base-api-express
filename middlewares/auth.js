@@ -1,5 +1,3 @@
-// const jwt = require('jsonwebtoken');
-// const config = require('../config');
 const { verifyToken } = require('../utils/token');
 const AuthError = require('../errors/AuthError');
 

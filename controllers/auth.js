@@ -1,5 +1,3 @@
-// const bcrypt = require('bcryptjs');
-// const jwt = require('jsonwebtoken');
 const models = require('../db/models');
 const { generatePassHash, comparePasswords } = require('../utils/passwordHash');
 const { createToken } = require('../utils/token');
@@ -11,7 +9,7 @@ const authErr = new AuthError('Invalid email or password.');
 const signUp = async (req, res, next) => {
   try {
     const { name, email, password, dob } = req.body;
-    const user = await models.User.findOne({ where: { email: email } });
+    const user = await models.User.findOne({ where: { email } });
 
     if (user) {
       throw new ValidationError('A user with this email already exists.');
